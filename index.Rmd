@@ -38,7 +38,7 @@ mega_city_map = data.frame(name = mega_city_df$City..en.,pop = mega_city_df$Popu
 ```
 
 
-### Assign different colors to the markers according to the population
+### Assign different colors to markers according to population
 ```{r pressure, echo=TRUE,warning=FALSE, comment=FALSE,fig.cap="Population of mega-cities"}
   
 colour_col = rep("",length(mega_city_map$pop))
