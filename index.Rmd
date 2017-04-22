@@ -1,0 +1,86 @@
+---
+title: "Week2 project"
+author: "Yao Tian"
+date: "April 22, 2017"
+output: html_document
+---
+Synopsis:
+
+This documenet draws a population of mega cities in the world. The population is also indicated by the radius and the color of the circular markers in the map. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(leaflet)
+
+
+```
+
+
+## Including Plots
+
+### Download data files
+```{r, echo=TRUE,warning=FALSE, comment=FALSE,fig.cap="Population of mega-cities"}
+mega_city_file = "mega_city.csv"
+url = "https://www.worlddata.info/download/megacities.csv"
+
+if (!file.exists(mega_city_file))
+{
+    download.file(url,mega_city_file)
+}
+
+
+
+mega_city_df = read.csv(mega_city_file,sep=";")
+
+
+mega_city_map = data.frame(name = mega_city_df$City..en.,pop = mega_city_df$Population, lat = mega_city_df$Latitude,lng = mega_city_df$Longitude,country.code = mega_city_df$Country.code)
+
+```
+
+
+### Assign different colors to the markers according to the population
+```{r pressure, echo=TRUE,warning=FALSE, comment=FALSE,fig.cap="Population of mega-cities"}
+  
+colour_col = rep("",length(mega_city_map$pop))
+colour_type = c("red","yellow","green","blue");
+pop1 = 10000000
+pop2 = 20000000
+pop3 = 30000000
+
+index = mega_city_map$pop<pop1
+colour_col[index] = colour_type[1]
+
+
+index = mega_city_map$pop>=pop1&mega_city_map$pop<pop2
+colour_col[index] = colour_type[2]
+
+
+index = mega_city_map$pop>=pop2&mega_city_map$pop<pop3
+colour_col[index] = colour_type[3]
+
+
+index = mega_city_map$pop>=pop3
+colour_col[index] = colour_type[4]
+
+mega_city_map$col = colour_col
+
+```
+
+### Make the map
+```{r ,echo=TRUE,warning=FALSE, comment=FALSE,fig.cap="Population of mega-cities"}
+radius_ratio = 10000;
+
+legend = c(paste("Populution<",toString(pop1)), paste("Populution>=",toString(pop1),"And <",toString(pop2)),
+           paste("Populution>=",toString(pop2),"And <",toString(pop3)),
+           paste("Populution>=",toString(pop3))
+           )
+ mega_city_map %>%
+leaflet()%>%
+     addTiles()%>%
+     addCircleMarkers(clusterOptions = markerClusterOptions(),weight=1,radius =sqrt(mega_city_map$pop/radius_ratio),color = mega_city_map$col,
+                      popup = paste(mega_city_map$pop,mega_city_map$name,mega_city_map$country.code,sep='\n'))%>%
+    addLegend(labels = legend, colors = colour_type)
+ #mega_city_map
+
+
+```
